@@ -60,9 +60,11 @@
         session (alia/connect cluster :cassandratraining)
         ;mapFromJson (json/read-json (:json-params request))
         mapFromJson (:json-params request)
-        insertstring (str "INSERT INTO  emp(emp_id,emp_city,emp_email,emp_name,emp_phone,emp_salary) VALUES('" (mapFromJson :emp_id) "'" ")")]
+        insertstring (str "INSERT INTO  emp(emp_id,emp_city,emp_email,emp_name,emp_phone,emp_salary) VALUES("(mapFromJson :emp_id)",'"(mapFromJson :emp_city)"','"(mapFromJson :emp_email)"','"(mapFromJson :emp_name)"',"(mapFromJson :emp_phone)"," (mapFromJson :emp_salary)")")
+        ]
     (prn insertstring)
     (prn mapFromJson)
+    (prn (alia/execute session insertstring))
     (ring-resp/created "http://fake-201-url" "fake 201 in the body"))
   )
 
