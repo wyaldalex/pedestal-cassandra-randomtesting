@@ -45,12 +45,12 @@
   [request]
   (http/json-response myMap))
 
-;Getting the employees from our Cassandra Database
+;Getting all employees from our Cassandra Database
 (defn get-employees
   [request]
   (let [cluster (alia/cluster {:contact-points ["localhost"]})
         session (alia/connect cluster :cassandratraining)]
-  (prn (alia/execute session "SELECT * FROM emp"))
+  ;(prn (alia/execute session "SELECT * FROM emp"))
   (http/json-response (alia/execute session "SELECT * FROM emp"))
   ))
 
@@ -67,6 +67,15 @@
     (prn (alia/execute session insertstring))
     (ring-resp/created "http://fake-201-url" "fake 201 in the body"))
   )
+
+;Getting one of the employees
+ (defn get-employee [request]
+    (let [employee_id (get-in request [:path-params :emp_id])
+          cluster (alia/cluster {:contact-points ["localhost"]})
+          session (alia/connect cluster :cassandratraining)
+          select_string (str "SELECT * FROM emp WHERE emp_id =" employee_id )]
+      (http/json-response (alia/execute session select_string))
+   ))
 
 (defn add-project
   [request]
@@ -90,7 +99,8 @@
               ["/projects/:name" :get (conj common-interceptors `get-project)]
               ["/addprojects" :post (conj common-interceptors `add-project)]
               ["/employees" :get (conj common-interceptors `get-employees)]
-              ["/employees" :post (conj common-interceptors `add-employee)]})
+              ["/employees" :post (conj common-interceptors `add-employee)]
+              ["/employee/:emp_id" :get (conj common-interceptors `get-employee)]})
 
 ;; Map-based routes
 ;(def routes `{"/" {:interceptors [(body-params/body-params) http/html-body]
